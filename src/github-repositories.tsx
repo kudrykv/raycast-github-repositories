@@ -27,11 +27,12 @@ const command = () => {
 export default command;
 
 
-const readSerialized = (serialized: LocalStorageValue | undefined) => {
-  const pullRepos = () => getRepos()
-    .then(list => list.map(item => item.full_name))
-    .then(names => ({ names, cache: false }));
+const pullRepos = () => getRepos()
+  .then(list => list.map(item => item.full_name))
+  .then(names => ({ names, cache: false }));
 
+
+const readSerialized = (serialized: LocalStorageValue | undefined) => {
   console.debug("getting value from the local storage -- typeof is", typeof serialized);
 
   if (!serialized || typeof serialized !== "string") {
@@ -55,7 +56,11 @@ const readSerialized = (serialized: LocalStorageValue | undefined) => {
 };
 
 
+const cacheNames = (names: string[]) =>
+  setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(names)).then(() => names);
+
+
 const cacheIfNotYetCached = ({ names, cache }: { names: string[], cache: boolean }): Promise<string[]> =>
   cache
     ? Promise.resolve(names)
-    : setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(names)).then(() => names);
+    : cacheNames(names);
