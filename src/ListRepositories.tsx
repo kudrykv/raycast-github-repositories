@@ -1,4 +1,4 @@
-import { ActionPanel, List, OpenInBrowserAction, SubmitFormAction } from "@raycast/api";
+import { ActionPanel, Icon, List, OpenInBrowserAction, SubmitFormAction } from "@raycast/api";
 
 interface ListRepositoriesParams {
   isLoading: boolean;
@@ -30,5 +30,5 @@ const RepositoryItemActionPanel = ({ name, onRefresh }: { name: string, onRefres
       url={`https://github.com/${name}/pulls`}
       shortcut={{ key: "p", modifiers: ["cmd", "shift"] }}
     />
-    <SubmitFormAction title={"Refresh Repositories List"} onSubmit={onRefresh} />
+    <SubmitFormAction icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onSubmit={onRefresh} />
   </ActionPanel>;
