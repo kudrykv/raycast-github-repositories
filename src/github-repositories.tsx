@@ -13,6 +13,14 @@ const command = () => {
   const [names, setNames] = useState<string[]>(["Loading..."]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const onRefresh = () => Promise.resolve()
+    .then(() => setIsLoading(true))
+    .then(() => setNames([]))
+    .then(pullRepos)
+    .then(cacheNames)
+    .then(setNames)
+    .then(() => setIsLoading(false));
+
   useEffect(() => {
     getLocalStorageItem(STORAGE_FULL_NAMES)
       .then(readSerialized)
@@ -21,7 +29,7 @@ const command = () => {
       .then(() => setIsLoading(false));
   }, []);
 
-  return <ListRepositories isLoading={isLoading} names={names} />;
+  return <ListRepositories isLoading={isLoading} names={names} onRefresh={onRefresh} />;
 };
 
 export default command;
@@ -56,11 +64,11 @@ const readSerialized = (serialized: LocalStorageValue | undefined) => {
 };
 
 
-const cacheNames = (names: string[]) =>
+const cacheNames = ({ names }: { names: string[] }) =>
   setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(names)).then(() => names);
 
 
 const cacheIfNotYetCached = ({ names, cache }: { names: string[], cache: boolean }): Promise<string[]> =>
   cache
     ? Promise.resolve(names)
-    : cacheNames(names);
+    : cacheNames({ names });
