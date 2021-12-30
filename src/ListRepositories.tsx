@@ -25,7 +25,7 @@ const RepositoryItemActionPanel = ({ name }: { name: string }) =>
   <ActionPanel>
     <OpenInBrowserAction title="Open repository" url={`https://github.com/${name}`} />
     <OpenInBrowserAction
-      title="Open repository"
+      title="Open Pull Requests"
       url={`https://github.com/${name}/pulls`}
       shortcut={{ key: "p", modifiers: ["cmd", "shift"] }}
     />
