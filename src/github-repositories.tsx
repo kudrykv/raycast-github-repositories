@@ -7,15 +7,15 @@ import { getRepos } from "./octokit-interations";
 import { ListRepositories } from "./ListRepositories";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
-
+const LOADING_TITLE = "Loading repositories that you can access. It may take a while...";
 
 const command = () => {
-  const [names, setNames] = useState<string[]>(["Loading..."]);
+  const [names, setNames] = useState<string[]>([LOADING_TITLE]);
   const [isLoading, setIsLoading] = useState(true);
 
   const onRefresh = () => Promise.resolve()
     .then(() => setIsLoading(true))
-    .then(() => setNames([]))
+    .then(() => setNames([LOADING_TITLE]))
     .then(pullRepos)
     .then(cacheNames)
     .then(setNames)

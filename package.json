@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "github-repositories",
-  "title": "Github Repositories",
+  "title": "Github Repositories Search",
   "description": "Quickly open repositories to which you have access.",
   "icon": "icon.png",
   "author": "bgnfu7re",
@@ -9,7 +9,7 @@
   "commands": [
     {
       "name": "github-repositories",
-      "title": "Github Repositories",
+      "title": "Github Repositories Search",
       "description": "Quickly open repositories to which you have access.",
       "mode": "view"
     }

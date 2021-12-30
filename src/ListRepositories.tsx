@@ -9,16 +9,16 @@ interface ListRepositoriesParams {
 
 export const ListRepositories = ({ names, isLoading, onRefresh }: ListRepositoriesParams) =>
   <List isLoading={isLoading}>
-    {names.map(name => <RepositoryItem key={name} name={name} onRefresh={onRefresh} />)}
+    {names.map(name => <RepositoryItem key={name} name={name} isLoading={isLoading} onRefresh={onRefresh} />)}
   </List>;
 
 
-const RepositoryItem = ({ name, onRefresh }: { name: string, onRefresh: () => void }) =>
+const RepositoryItem = ({ name, isLoading, onRefresh }: { name: string, isLoading: boolean, onRefresh: () => void }) =>
   <List.Item
     key={name}
     title={name}
     icon={{ source: { light: "icon.png", dark: "icon@dark.png" } }}
-    actions={<RepositoryItemActionPanel name={name} onRefresh={onRefresh} />}
+    actions={isLoading ? undefined : <RepositoryItemActionPanel name={name} onRefresh={onRefresh} />}
   />;
 
 
