@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem } from "@raycast/api";
+import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem, showToast, ToastStyle } from "@raycast/api";
 import { useEffect, useState } from "react";
 
 import { getRepos } from "./octokit-interations";
@@ -10,7 +10,7 @@ const STORAGE_FULL_NAMES = "cached-full-names";
 const LOADING_TITLE = "Loading repositories that you can access. It may take a while...";
 
 const command = () => {
-  const [names, setNames] = useState<string[]>([LOADING_TITLE]);
+  const [names, setNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const onRefresh = () => Promise.resolve()
@@ -19,14 +19,21 @@ const command = () => {
     .then(pullRepos)
     .then(cacheNames)
     .then(setNames)
-    .then(() => setIsLoading(false));
+    .then(() => setIsLoading(false))
+    .catch(showError);
 
   useEffect(() => {
     getLocalStorageItem(STORAGE_FULL_NAMES)
+      .then((value) => {
+        !value && setNames([LOADING_TITLE]);
+
+        return value;
+      })
       .then(readSerialized)
       .then(cacheIfNotYetCached)
       .then(setNames)
-      .then(() => setIsLoading(false));
+      .then(() => setIsLoading(false))
+      .catch(showError);
   }, []);
 
   return <ListRepositories isLoading={isLoading} names={names} onRefresh={onRefresh} />;
@@ -72,3 +79,6 @@ const cacheIfNotYetCached = ({ names, cache }: { names: string[], cache: boolean
   cache
     ? Promise.resolve(names)
     : cacheNames({ names });
+
+
+const showError = (e: Error) => showToast(ToastStyle.Failure, e.message)
