@@ -28,7 +28,7 @@ export const getRepos = (
         return upd;
       }
 
-      return getRepos(acc, { page: page + 1, per_page });
+      return getRepos([...acc, ...list], { page: page + 1, per_page });
     });
 
 
