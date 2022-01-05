@@ -1,33 +1,46 @@
 import { ActionPanel, Icon, List, OpenInBrowserAction, SubmitFormAction } from "@raycast/api";
+import { RepositoryObject } from "./octokit-interations";
 
 interface ListRepositoriesParams {
   isLoading: boolean;
-  names: string[];
+  repositories: RepositoryObject[];
   onRefresh: () => void;
 }
 
-
-export const ListRepositories = ({ names, isLoading, onRefresh }: ListRepositoriesParams) =>
+export const ListRepositories = ({ repositories, isLoading, onRefresh }: ListRepositoriesParams) =>
   <List isLoading={isLoading}>
-    {names.map(name => <RepositoryItem key={name} name={name} isLoading={isLoading} onRefresh={onRefresh} />)}
+    {repositories.map(repo => <RepositoryItem
+      key={repo.full_name}
+      repo={repo}
+      isLoading={isLoading}
+      onRefresh={onRefresh}
+    />)}
   </List>;
 
 
-const RepositoryItem = ({ name, isLoading, onRefresh }: { name: string, isLoading: boolean, onRefresh: () => void }) =>
+interface RepositoryItemParams {
+  repo: RepositoryObject;
+  isLoading: boolean;
+  onRefresh: () => void;
+}
+
+const RepositoryItem = ({ repo, isLoading, onRefresh }: RepositoryItemParams) =>
   <List.Item
-    key={name}
-    title={name}
-    icon={{ source: { light: "icon.png", dark: "icon@dark.png" } }}
-    actions={isLoading ? undefined : <RepositoryItemActionPanel name={name} onRefresh={onRefresh} />}
+    id={repo.full_name}
+    key={repo.full_name}
+    title={repo.full_name}
+    icon={repo.owner?.avatar_url ? repo.owner.avatar_url : { source: { light: "icon.png", dark: "icon@dark.png" } }}
+    subtitle={repo.stargazers_count ? `☆ ${repo.stargazers_count}` : undefined}
+    actions={isLoading ? undefined : <RepositoryItemActionPanel repo={repo} onRefresh={onRefresh} />}
   />;
 
 
-const RepositoryItemActionPanel = ({ name, onRefresh }: { name: string, onRefresh: () => void }) =>
+const RepositoryItemActionPanel = ({ repo, onRefresh }: { repo: RepositoryObject, onRefresh: () => void }) =>
   <ActionPanel>
-    <OpenInBrowserAction title="Open repository" url={`https://github.com/${name}`} />
+    <OpenInBrowserAction title="Open repository" url={`https://github.com/${repo.full_name}`} />
     <OpenInBrowserAction
       title="Open Pull Requests"
-      url={`https://github.com/${name}/pulls`}
+      url={`https://github.com/${repo.full_name}/pulls`}
       shortcut={{ key: "p", modifiers: ["cmd", "shift"] }}
     />
     <SubmitFormAction icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onSubmit={onRefresh} />

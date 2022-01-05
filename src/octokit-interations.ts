@@ -11,8 +11,12 @@ interface GetReposParams {
   per_page: number;
 }
 
-interface RepositoryObject {
+export interface RepositoryObject {
   full_name: string;
+  owner?: {
+    avatar_url: string;
+  }
+  stargazers_count?: number;
 }
 
 export const getRepos = (

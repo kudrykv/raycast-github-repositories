@@ -1,50 +1,57 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem, showToast, ToastStyle } from "@raycast/api";
+import {
+  clearLocalStorage,
+  getLocalStorageItem,
+  LocalStorageValue,
+  setLocalStorageItem,
+  showToast,
+  ToastStyle
+} from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { getRepos } from "./octokit-interations";
+import { getRepos, RepositoryObject } from "./octokit-interations";
 import { ListRepositories } from "./ListRepositories";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
 const LOADING_TITLE = "Loading repositories that you can access. It may take a while...";
+const LOADING = [{ full_name: LOADING_TITLE } as RepositoryObject];
 
-const command = () => {
-  const [names, setNames] = useState<string[]>([]);
+const Command = () => {
+  const [repositories, setRepositories] = useState<RepositoryObject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const onRefresh = () => Promise.resolve()
     .then(() => setIsLoading(true))
-    .then(() => setNames([LOADING_TITLE]))
+    .then(() => setRepositories(LOADING))
     .then(pullRepos)
-    .then(cacheNames)
-    .then(setNames)
+    .then(cacheRepos)
+    .then(setRepositories)
     .then(() => setIsLoading(false))
     .catch(showError);
 
   useEffect(() => {
     getLocalStorageItem(STORAGE_FULL_NAMES)
       .then((value) => {
-        !value && setNames([LOADING_TITLE]);
+        !value && setRepositories(LOADING);
 
         return value;
       })
       .then(readSerialized)
       .then(cacheIfNotYetCached)
-      .then(setNames)
+      .then(setRepositories)
       .then(() => setIsLoading(false))
       .catch(showError);
   }, []);
 
-  return <ListRepositories isLoading={isLoading} names={names} onRefresh={onRefresh} />;
+  return <ListRepositories isLoading={isLoading} repositories={repositories} onRefresh={onRefresh} />;
 };
 
-export default command;
+export default Command;
 
 
 const pullRepos = () => getRepos()
-  .then(list => list.map(item => item.full_name))
-  .then(names => ({ names, cache: false }));
+  .then(list => ({ list, cache: false }));
 
 
 const readSerialized = (serialized: LocalStorageValue | undefined) => {
@@ -57,9 +64,9 @@ const readSerialized = (serialized: LocalStorageValue | undefined) => {
   }
 
   console.debug("parsing serialized");
-  const names = JSON.parse(serialized);
+  const list = JSON.parse(serialized) as RepositoryObject[];
 
-  if (!names || !names.length || names.length === 0) {
+  if (!list || !list.length || list.length === 0) {
     console.debug("no repos were found in parsed data");
 
     return pullRepos();
@@ -67,18 +74,19 @@ const readSerialized = (serialized: LocalStorageValue | undefined) => {
 
   console.debug("returning cached data");
 
-  return { names, cache: true };
+  return Promise.resolve({ list, cache: true });
 };
 
 
-const cacheNames = ({ names }: { names: string[] }) =>
-  setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(names)).then(() => names);
+const cacheRepos = ({ list }: { list: RepositoryObject[] }) =>
+  setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(list))
+    .then(() => list);
 
 
-const cacheIfNotYetCached = ({ names, cache }: { names: string[], cache: boolean }): Promise<string[]> =>
+const cacheIfNotYetCached = ({ list, cache }: { list: RepositoryObject[], cache: boolean }): Promise<RepositoryObject[]> =>
   cache
-    ? Promise.resolve(names)
-    : cacheNames({ names });
+    ? Promise.resolve(list)
+    : cacheRepos({ list });
 
 
-const showError = (e: Error) => showToast(ToastStyle.Failure, e.message)
+const showError = (e: Error) => showToast(ToastStyle.Failure, e.message);
