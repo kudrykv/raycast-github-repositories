@@ -25,28 +25,6 @@ export const useRepositories = () => {
     .then(groupByStars)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
 
-  const putFromLeftToRight = (left: RepositoryObject[], right: RepositoryObject[]) => {
-    return (full_name: string) => {
-      const repo = left.find(repo => repo.full_name === full_name);
-      if (!repo) {
-        return [left, right];
-      }
-
-      left = left.filter(repo => repo.full_name !== full_name);
-
-      if (right.length === 0) {
-        return [left, [repo]];
-      }
-
-      const cutIndex = right.findIndex(repo => full_name.toLowerCase() < repo.full_name.toLowerCase());
-      right = cutIndex < 0
-        ? [...right, repo]
-        : [...right.splice(0, cutIndex), repo, ...right];
-
-      return [left, right];
-    };
-  };
-
   const onStar = ({ full_name }: { full_name: string }) =>
     setState(({ starred, rest, ...other }) => {
       [rest, starred] = putFromLeftToRight(rest, starred)(full_name);
@@ -121,3 +99,25 @@ const cacheIfNotYetCached = ({ list, cache }: { list: RepositoryObject[], cache:
   cache
     ? Promise.resolve(list)
     : setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(list)).then(() => list);
+
+const putFromLeftToRight = (left: RepositoryObject[], right: RepositoryObject[]) => {
+  return (full_name: string) => {
+    const repo = left.find(repo => repo.full_name === full_name);
+    if (!repo) {
+      return [left, right];
+    }
+
+    left = left.filter(repo => repo.full_name !== full_name);
+
+    if (right.length === 0) {
+      return [left, [repo]];
+    }
+
+    const cutIndex = right.findIndex(repo => full_name.toLowerCase() < repo.full_name.toLowerCase());
+    right = cutIndex < 0
+      ? [...right, repo]
+      : [...right.splice(0, cutIndex), repo, ...right];
+
+    return [left, right];
+  };
+};
