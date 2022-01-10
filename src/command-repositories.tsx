@@ -14,37 +14,49 @@ import { ListRepositories } from "./ListRepositories";
 import { RepositoryObject } from "./types";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
-const LOADING_TITLE = "Loading repositories that you can access. It may take a while...";
-const LOADING = [{ full_name: LOADING_TITLE } as RepositoryObject];
+const STORAGE_STARRED = "starred-repos-full-names";
 
 const Command = () => {
-  const [repositories, setRepositories] = useState<RepositoryObject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [starred, setStarred] = useState<RepositoryObject[]>([]);
+  const [rest, setRest] = useState<RepositoryObject[]>([]);
 
   const onRefresh = () => Promise.resolve()
     .then(() => setIsLoading(true))
-    .then(() => setRepositories(LOADING))
     .then(pullRepos)
     .then(cacheRepos)
-    .then(setRepositories)
     .then(() => setIsLoading(false))
     .catch(showError);
 
   useEffect(() => {
-    getLocalStorageItem(STORAGE_FULL_NAMES)
-      .then((value) => {
-        !value && setRepositories(LOADING);
+    Promise.all([
+      getLocalStorageItem(STORAGE_FULL_NAMES)
+        .then(parseSerializedRepos)
+        .then(cacheIfNotYetCached),
+      getLocalStorageItem(STORAGE_STARRED)
+        .then(parseSerializedStars)
+    ])
+      .then(([repos, stars]) =>
+        repos.reduce(({ starred, rest }, curr) => {
+          stars.find(star => star === curr.full_name)
+            ? starred.push(curr)
+            : rest.push(curr);
 
-        return value;
+          return { starred, rest };
+        }, { starred: [], rest: [] } as { starred: RepositoryObject[], rest: RepositoryObject[] }))
+      .then(({starred, rest}) => {
+        setStarred(starred);
+        setRest(rest);
+        setIsLoading(false);
       })
-      .then(readSerialized)
-      .then(cacheIfNotYetCached)
-      .then(setRepositories)
-      .then(() => setIsLoading(false))
-      .catch(showError);
   }, []);
 
-  return <ListRepositories isLoading={isLoading} repositories={repositories} onRefresh={onRefresh} />;
+  return <ListRepositories
+    isLoading={isLoading}
+    starred={starred}
+    rest={rest}
+    onRefresh={onRefresh}
+  />;
 };
 
 export default Command;
@@ -54,7 +66,7 @@ const pullRepos = () => getRepos()
   .then(list => ({ list, cache: false }));
 
 
-const readSerialized = (serialized: LocalStorageValue | undefined) => {
+const parseSerializedRepos = (serialized: LocalStorageValue | undefined) => {
   if (!serialized || typeof serialized !== "string") {
     return pullRepos();
   }
@@ -69,12 +81,24 @@ const readSerialized = (serialized: LocalStorageValue | undefined) => {
 };
 
 
+const parseSerializedStars = (serialized: LocalStorageValue | undefined): string[] => {
+  if (!serialized || typeof serialized !== "string") {
+    return [];
+  }
+
+  return JSON.parse(serialized) || [];
+};
+
+
 const cacheRepos = ({ list }: { list: RepositoryObject[] }) =>
   setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(list))
     .then(() => list);
 
 
-const cacheIfNotYetCached = ({ list, cache }: { list: RepositoryObject[], cache: boolean }): Promise<RepositoryObject[]> =>
+const cacheIfNotYetCached = ({
+                               list,
+                               cache
+                             }: { list: RepositoryObject[], cache: boolean }): Promise<RepositoryObject[]> =>
   cache
     ? Promise.resolve(list)
     : cacheRepos({ list });
