@@ -7,20 +7,27 @@ interface ListRepositoriesParams {
   favorites: RepositoryObject[];
   rest: RepositoryObject[];
   onRefresh: () => void;
-  onStar: ({ full_name }: { full_name: string }) => void;
-  onUnstar: ({ full_name }: { full_name: string }) => void;
+  onFavorite: ({ full_name }: { full_name: string }) => void;
+  onUnFavorite: ({ full_name }: { full_name: string }) => void;
 }
 
-export const ListRepositories = ({ favorites, rest, isLoading, onRefresh, onStar, onUnstar }: ListRepositoriesParams) =>
+export const ListRepositories = ({
+                                   favorites,
+                                   rest,
+                                   isLoading,
+                                   onRefresh,
+                                   onFavorite,
+                                   onUnFavorite
+                                 }: ListRepositoriesParams) =>
   <List isLoading={isLoading}>
     {favorites && favorites.length > 0 &&
-      <List.Section title="Starred">
+      <List.Section title="Favorites">
         {favorites.map(repo => <RepoItem
           key={repo.id}
           repo={repo}
           isLoading={isLoading}
           onRefresh={onRefresh}
-          onUnstar={onUnstar}
+          onUnFavorite={onUnFavorite}
         />)}
       </List.Section>
     }
@@ -31,7 +38,7 @@ export const ListRepositories = ({ favorites, rest, isLoading, onRefresh, onStar
           repo={repo}
           isLoading={isLoading}
           onRefresh={onRefresh}
-          onStar={onStar}
+          onFavorite={onFavorite}
         />)}
       </List.Section>
     }
@@ -42,11 +49,11 @@ interface RepoItemParams {
   repo: RepositoryObject;
   isLoading: boolean;
   onRefresh: () => void;
-  onStar?: ({ full_name }: { full_name: string }) => void;
-  onUnstar?: ({ full_name }: { full_name: string }) => void;
+  onFavorite?: ({ full_name }: { full_name: string }) => void;
+  onUnFavorite?: ({ full_name }: { full_name: string }) => void;
 }
 
-const RepoItem = ({ repo, isLoading, onRefresh, onStar, onUnstar }: RepoItemParams) =>
+const RepoItem = ({ repo, isLoading, onRefresh, onFavorite, onUnFavorite }: RepoItemParams) =>
   <List.Item
     id={repo.full_name}
     key={repo.full_name}
@@ -56,7 +63,8 @@ const RepoItem = ({ repo, isLoading, onRefresh, onStar, onUnstar }: RepoItemPara
     actions={
       isLoading
         ? undefined
-        : <RepositoryItemActionPanel repo={repo} onRefresh={onRefresh} onStar={onStar} onUnstar={onUnstar} />
+        : <RepositoryItemActionPanel repo={repo} onRefresh={onRefresh} onFavorite={onFavorite}
+                                     onUnFavorite={onUnFavorite} />
     }
   />;
 
@@ -64,11 +72,11 @@ const RepoItem = ({ repo, isLoading, onRefresh, onStar, onUnstar }: RepoItemPara
 interface RepoItemActionPanelParams {
   repo: RepositoryObject;
   onRefresh: () => void;
-  onStar?: ({ full_name }: { full_name: string }) => void;
-  onUnstar?: ({ full_name }: { full_name: string }) => void;
+  onFavorite?: ({ full_name }: { full_name: string }) => void;
+  onUnFavorite?: ({ full_name }: { full_name: string }) => void;
 }
 
-const RepositoryItemActionPanel = ({ repo, onRefresh, onStar, onUnstar }: RepoItemActionPanelParams) =>
+const RepositoryItemActionPanel = ({ repo, onRefresh, onFavorite, onUnFavorite }: RepoItemActionPanelParams) =>
   <ActionPanel>
     <OpenInBrowserAction title="Open repository" url={`https://github.com/${repo.full_name}`} />
     <PushAction
@@ -78,19 +86,19 @@ const RepositoryItemActionPanel = ({ repo, onRefresh, onStar, onUnstar }: RepoIt
       icon={{ source: { light: "git-pull-request.png", dark: "git-pull-request.png" } }}
     />
     <ActionPanel.Item icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onAction={onRefresh} />
-    {onStar &&
+    {onFavorite &&
       <ActionPanel.Item
         icon={Icon.ArrowClockwise}
         title={"Star"}
-        onAction={() => onStar({ full_name: repo.full_name })}
+        onAction={() => onFavorite({ full_name: repo.full_name })}
         shortcut={{ key: "s", modifiers: ["cmd", "shift"] }}
       />
     }
-    {onUnstar &&
+    {onUnFavorite &&
       <ActionPanel.Item
         icon={Icon.ArrowClockwise}
         title={"Unstar"}
-        onAction={() => onUnstar({ full_name: repo.full_name })}
+        onAction={() => onUnFavorite({ full_name: repo.full_name })}
         shortcut={{ key: "s", modifiers: ["cmd", "shift"] }}
       />
     }

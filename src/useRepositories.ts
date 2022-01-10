@@ -52,7 +52,7 @@ export const useRepositories = () => {
       .then(({ favorites, rest }) => setState({ favorites, rest, isLoading: false }));
   }, []);
 
-  return { isLoading, favorites, rest, onRefresh, onStar, onUnstar };
+  return { isLoading, favorites, rest, onRefresh, onFavorite: onStar, onUnFavorite: onUnstar };
 };
 
 
