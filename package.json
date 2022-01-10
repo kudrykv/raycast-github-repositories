@@ -9,8 +9,14 @@
   "commands": [
     {
       "name": "command-repositories",
-      "title": "Github Repositories Search",
+      "title": "Repositories Search",
       "description": "Quickly open repositories to which you have access.",
+      "mode": "view"
+    },
+    {
+      "name": "command-pulls",
+      "title": "Opened Pulls",
+      "description": "View all opened pulls for repositories you're interested in.",
       "mode": "view"
     }
   ],
