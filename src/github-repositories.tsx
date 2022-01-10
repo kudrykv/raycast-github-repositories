@@ -9,8 +9,9 @@ import {
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 
-import { getRepos, RepositoryObject } from "./octokit-interations";
+import { getRepos } from "./octokit-interations";
 import { ListRepositories } from "./ListRepositories";
+import { RepositoryObject } from "./types";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
 const LOADING_TITLE = "Loading repositories that you can access. It may take a while...";
@@ -54,24 +55,15 @@ const pullRepos = () => getRepos()
 
 
 const readSerialized = (serialized: LocalStorageValue | undefined) => {
-  console.debug("getting value from the local storage -- typeof is", typeof serialized);
-
   if (!serialized || typeof serialized !== "string") {
-    console.debug("pulling data b/c nothing has been found in the local storage");
-
     return pullRepos();
   }
 
-  console.debug("parsing serialized");
   const list = JSON.parse(serialized) as RepositoryObject[];
 
   if (!list || !list.length || list.length === 0) {
-    console.debug("no repos were found in parsed data");
-
     return pullRepos();
   }
-
-  console.debug("returning cached data");
 
   return Promise.resolve({ list, cache: true });
 };

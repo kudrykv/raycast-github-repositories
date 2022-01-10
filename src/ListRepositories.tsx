@@ -1,6 +1,6 @@
 import { ActionPanel, Icon, List, OpenInBrowserAction, SubmitFormAction, PushAction } from "@raycast/api";
-import { RepositoryObject } from "./octokit-interations";
 import { ListPulls } from "./ListPulls";
+import { RepositoryObject } from "./types";
 
 interface ListRepositoriesParams {
   isLoading: boolean;

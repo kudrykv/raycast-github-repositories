@@ -1,6 +1,7 @@
 import { Color, ImageLike, List } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getPreparedPulls, PullObject } from "./octokit-interations";
+import { getPreparedPulls } from "./octokit-interations";
+import { PullObject } from "./types";
 
 export const ListPulls = ({ owner, repo }: { owner: string, repo: string }) => {
   const [isLoading, setIsLoading] = useState(true);
