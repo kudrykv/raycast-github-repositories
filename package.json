@@ -8,7 +8,7 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "github-repositories",
+      "name": "command-repositories",
       "title": "Github Repositories Search",
       "description": "Quickly open repositories to which you have access.",
       "mode": "view"

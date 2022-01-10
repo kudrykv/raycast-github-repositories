@@ -28,6 +28,7 @@ const RepositoryItemActionPanel = ({ repo, onRefresh }: { repo: RepositoryObject
       title={"Pull Requests"}
       target={<ListPulls owner={repo.owner?.login || ''} repo={repo.name} />}
       shortcut={{key: "p", modifiers: ["cmd", "shift"]}}
+      icon={{source: {light: "git-pull-request.png", dark: "git-pull-request.png"}}}
     />
     <SubmitFormAction icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onSubmit={onRefresh} />
   </ActionPanel>;
