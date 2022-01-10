@@ -26,6 +26,7 @@ export interface PullObject {
   state: string;
   locked: boolean;
   title: string;
+  html_url: string;
   user: {
     login: string;
     id: number;
