@@ -4,18 +4,18 @@ import { RepositoryObject } from "./types";
 
 interface ListRepositoriesParams {
   isLoading: boolean;
-  starred: RepositoryObject[];
+  favorites: RepositoryObject[];
   rest: RepositoryObject[];
   onRefresh: () => void;
   onStar: ({ full_name }: { full_name: string }) => void;
   onUnstar: ({ full_name }: { full_name: string }) => void;
 }
 
-export const ListRepositories = ({ starred, rest, isLoading, onRefresh, onStar, onUnstar }: ListRepositoriesParams) =>
+export const ListRepositories = ({ favorites, rest, isLoading, onRefresh, onStar, onUnstar }: ListRepositoriesParams) =>
   <List isLoading={isLoading}>
-    {starred && starred.length > 0 &&
+    {favorites && favorites.length > 0 &&
       <List.Section title="Starred">
-        {starred.map(repo => <RepoItem
+        {favorites.map(repo => <RepoItem
           key={repo.id}
           repo={repo}
           isLoading={isLoading}

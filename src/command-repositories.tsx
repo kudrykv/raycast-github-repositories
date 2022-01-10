@@ -4,11 +4,11 @@ import { ListRepositories } from "./ListRepositories";
 import { useRepositories } from "./useRepositories";
 
 const Command = () => {
-  const { isLoading, starred, rest, onRefresh, onStar, onUnstar } = useRepositories();
+  const { isLoading, favorites, rest, onRefresh, onStar, onUnstar } = useRepositories();
 
   return <ListRepositories
     isLoading={isLoading}
-    starred={starred}
+    favorites={favorites}
     rest={rest}
     onRefresh={onRefresh}
     onStar={onStar}

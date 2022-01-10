@@ -7,8 +7,8 @@ const STORAGE_FULL_NAMES = "cached-full-names";
 const STORAGE_STARRED = "starred-repos-full-names";
 
 export const useRepositories = () => {
-  const [{ starred, rest, isLoading }, setState] = useState({
-    starred: [] as RepositoryObject[],
+  const [{ favorites, rest, isLoading }, setState] = useState({
+    favorites: [] as RepositoryObject[],
     rest: [] as RepositoryObject[],
     isLoading: true
   });
@@ -22,21 +22,21 @@ export const useRepositories = () => {
     getLocalStorageItem(STORAGE_STARRED)
       .then(parseSerializedStars)
   ])
-    .then(groupByStars)
+    .then(groupByFavorites)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
 
   const onStar = ({ full_name }: { full_name: string }) =>
-    setState(({ starred, rest, ...other }) => {
-      [rest, starred] = putFromLeftToRight(rest, starred)(full_name);
+    setState(({ favorites, rest, ...other }) => {
+      [rest, favorites] = putFromLeftToRight(rest, favorites)(full_name);
 
-      return { ...other, starred, rest };
+      return { ...other, favorites, rest };
     });
 
   const onUnstar = ({ full_name }: { full_name: string }) =>
-    setState(({ starred, rest, ...other }) => {
-      [starred, rest] = putFromLeftToRight(starred, rest)(full_name);
+    setState(({ favorites, rest, ...other }) => {
+      [favorites, rest] = putFromLeftToRight(favorites, rest)(full_name);
 
-      return { ...other, starred, rest };
+      return { ...other, favorites, rest };
     });
 
   useEffect(() => {
@@ -48,22 +48,22 @@ export const useRepositories = () => {
       getLocalStorageItem(STORAGE_STARRED)
         .then(parseSerializedStars)
     ])
-      .then(groupByStars)
-      .then(({ starred, rest }) => setState({ starred, rest, isLoading: false }));
+      .then(groupByFavorites)
+      .then(({ favorites, rest }) => setState({ favorites, rest, isLoading: false }));
   }, []);
 
-  return { isLoading, starred, rest, onRefresh, onStar, onUnstar };
+  return { isLoading, favorites, rest, onRefresh, onStar, onUnstar };
 };
 
 
-const groupByStars = ([repos, stars]: [RepositoryObject[], string[]]) =>
-  repos.reduce(({ starred, rest }, curr) => {
-    stars.find(star => star === curr.full_name)
-      ? starred.push(curr)
+const groupByFavorites = ([repos, favs]: [RepositoryObject[], string[]]) =>
+  repos.reduce(({ favorites, rest }, curr) => {
+    favs.find(fav => fav === curr.full_name)
+      ? favorites.push(curr)
       : rest.push(curr);
 
-    return { starred, rest };
-  }, { starred: [], rest: [] } as { starred: RepositoryObject[], rest: RepositoryObject[] });
+    return { favorites, rest };
+  }, { favorites: [], rest: [] } as { favorites: RepositoryObject[], rest: RepositoryObject[] });
 
 
 const serializedRepos = (serialized: LocalStorageValue | undefined) => {
