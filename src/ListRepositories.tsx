@@ -1,4 +1,4 @@
-import { ActionPanel, Icon, List, OpenInBrowserAction, SubmitFormAction, PushAction } from "@raycast/api";
+import { ActionPanel, Icon, List, OpenInBrowserAction, PushAction } from "@raycast/api";
 import { ListPulls } from "./ListPulls";
 import { RepositoryObject } from "./types";
 
@@ -7,39 +7,68 @@ interface ListRepositoriesParams {
   starred: RepositoryObject[];
   rest: RepositoryObject[];
   onRefresh: () => void;
+  onStar: ({ full_name }: { full_name: string }) => void;
+  onUnstar: ({ full_name }: { full_name: string }) => void;
 }
 
-export const ListRepositories = ({ starred, rest, isLoading, onRefresh }: ListRepositoriesParams) =>
+export const ListRepositories = ({ starred, rest, isLoading, onRefresh, onStar, onUnstar }: ListRepositoriesParams) =>
   <List isLoading={isLoading}>
     {starred && starred.length > 0 &&
       <List.Section title="Starred">
-        {starred.map(repo => <RepoItem key={repo.id} repo={repo} isLoading={isLoading} onRefresh={onRefresh} />)}
+        {starred.map(repo => <RepoItem
+          key={repo.id}
+          repo={repo}
+          isLoading={isLoading}
+          onRefresh={onRefresh}
+          onUnstar={onUnstar}
+        />)}
       </List.Section>
     }
     {rest && rest.length > 0 &&
       <List.Section title="Repos">
-        {rest.map(repo => <RepoItem key={repo.id} repo={repo} isLoading={isLoading} onRefresh={onRefresh} />)}
+        {rest.map(repo => <RepoItem
+          key={repo.id}
+          repo={repo}
+          isLoading={isLoading}
+          onRefresh={onRefresh}
+          onStar={onStar}
+        />)}
       </List.Section>
     }
   </List>;
 
 
-const RepoItem = ({
-                    repo,
-                    isLoading,
-                    onRefresh
-                  }: { repo: RepositoryObject, isLoading: boolean, onRefresh: () => void }) =>
+interface RepoItemParams {
+  repo: RepositoryObject;
+  isLoading: boolean;
+  onRefresh: () => void;
+  onStar?: ({ full_name }: { full_name: string }) => void;
+  onUnstar?: ({ full_name }: { full_name: string }) => void;
+}
+
+const RepoItem = ({ repo, isLoading, onRefresh, onStar, onUnstar }: RepoItemParams) =>
   <List.Item
     id={repo.full_name}
     key={repo.full_name}
     title={repo.full_name}
     icon={repo.owner?.avatar_url ? repo.owner.avatar_url : { source: { light: "icon.png", dark: "icon@dark.png" } }}
     subtitle={repo.stargazers_count ? `☆ ${repo.stargazers_count}` : undefined}
-    actions={isLoading ? undefined : <RepositoryItemActionPanel repo={repo} onRefresh={onRefresh} />}
+    actions={
+      isLoading
+        ? undefined
+        : <RepositoryItemActionPanel repo={repo} onRefresh={onRefresh} onStar={onStar} onUnstar={onUnstar} />
+    }
   />;
 
 
-const RepositoryItemActionPanel = ({ repo, onRefresh }: { repo: RepositoryObject, onRefresh: () => void }) =>
+interface RepoItemActionPanelParams {
+  repo: RepositoryObject;
+  onRefresh: () => void;
+  onStar?: ({ full_name }: { full_name: string }) => void;
+  onUnstar?: ({ full_name }: { full_name: string }) => void;
+}
+
+const RepositoryItemActionPanel = ({ repo, onRefresh, onStar, onUnstar }: RepoItemActionPanelParams) =>
   <ActionPanel>
     <OpenInBrowserAction title="Open repository" url={`https://github.com/${repo.full_name}`} />
     <PushAction
@@ -48,5 +77,21 @@ const RepositoryItemActionPanel = ({ repo, onRefresh }: { repo: RepositoryObject
       shortcut={{ key: "p", modifiers: ["cmd", "shift"] }}
       icon={{ source: { light: "git-pull-request.png", dark: "git-pull-request.png" } }}
     />
-    <SubmitFormAction icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onSubmit={onRefresh} />
+    <ActionPanel.Item icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onAction={onRefresh} />
+    {onStar &&
+      <ActionPanel.Item
+        icon={Icon.ArrowClockwise}
+        title={"Star"}
+        onAction={() => onStar({ full_name: repo.full_name })}
+        shortcut={{ key: "s", modifiers: ["cmd", "shift"] }}
+      />
+    }
+    {onUnstar &&
+      <ActionPanel.Item
+        icon={Icon.ArrowClockwise}
+        title={"Unstar"}
+        onAction={() => onUnstar({ full_name: repo.full_name })}
+        shortcut={{ key: "s", modifiers: ["cmd", "shift"] }}
+      />
+    }
   </ActionPanel>;

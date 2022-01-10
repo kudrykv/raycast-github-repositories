@@ -25,6 +25,43 @@ export const useRepositories = () => {
     .then(groupByStars)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
 
+  const onStar = ({ full_name }: { full_name: string }) =>
+    setState(({ starred, rest, ...other }) => {
+      const repo = rest.find(repo => repo.full_name === full_name);
+      if (!repo) {
+        return { ...other, starred, rest };
+      }
+
+      rest = rest.filter(repo => repo.full_name !== full_name);
+
+      if (starred.length === 0) {
+        return { ...other, rest, starred: [repo] };
+      }
+
+      const cutIndex = starred.findIndex(starred => starred.full_name > repo.full_name);
+      starred = [...starred.splice(0, cutIndex + 1), repo, ...starred];
+
+      return { ...other, starred, rest };
+    });
+
+  const onUnstar = ({ full_name }: { full_name: string }) =>
+    setState(({ starred, rest, ...other }) => {
+      const repo = starred.find(repo => repo.full_name === full_name);
+      if (!repo) {
+        return { ...other, starred, rest };
+      }
+
+      starred = starred.filter(repo => repo.full_name !== full_name);
+
+      if (rest.length === 0) {
+        return { ...other, starred, rest: [repo] };
+      }
+
+      const cutIndex = rest.findIndex(item => item.full_name > repo.full_name);
+      rest = [...rest.splice(0, cutIndex + 1), repo, ...rest];
+
+      return { ...other, starred, rest };
+    });
 
   useEffect(() => {
     Promise.all([
@@ -39,7 +76,7 @@ export const useRepositories = () => {
       .then(({ starred, rest }) => setState({ starred, rest, isLoading: false }));
   }, []);
 
-  return { isLoading, starred, rest, onRefresh };
+  return { isLoading, starred, rest, onRefresh, onStar, onUnstar };
 };
 
 
