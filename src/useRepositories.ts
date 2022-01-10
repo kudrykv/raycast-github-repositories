@@ -13,14 +13,18 @@ export const useRepositories = () => {
     isLoading: true
   });
 
-  const onRefresh = () => Promise.resolve()
-    .then(() => setState(prev => ({ ...prev, isLoading: true })))
-    .then(getRepos)
-    .then(list => ({ list, cache: false }))
-    .then(cacheIfNotYetCached)
-    .then(list => ([list, starred.map(item => item.full_name)] as [RepositoryObject[], string[]]))
+  const onRefresh = () => Promise.all([
+    Promise.resolve()
+      .then(() => setState(prev => ({ ...prev, isLoading: true })))
+      .then(getRepos)
+      .then(list => ({ list, cache: false }))
+      .then(cacheIfNotYetCached),
+    getLocalStorageItem(STORAGE_STARRED)
+      .then(parseSerializedStars)
+  ])
     .then(groupByStars)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
+
 
   useEffect(() => {
     Promise.all([
