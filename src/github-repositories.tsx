@@ -1,7 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {
-  clearLocalStorage,
   getLocalStorageItem,
   LocalStorageValue,
   setLocalStorageItem,
