@@ -13,6 +13,15 @@ export const useRepositories = () => {
     isLoading: true
   });
 
+  const onRefresh = () => Promise.resolve()
+    .then(() => setState(prev => ({ ...prev, isLoading: true })))
+    .then(getRepos)
+    .then(list => ({ list, cache: false }))
+    .then(cacheIfNotYetCached)
+    .then(list => ([list, starred.map(item => item.full_name)] as [RepositoryObject[], string[]]))
+    .then(groupByStars)
+    .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
+
   useEffect(() => {
     Promise.all([
       getLocalStorageItem(STORAGE_FULL_NAMES)
@@ -26,11 +35,11 @@ export const useRepositories = () => {
       .then(({ starred, rest }) => setState({ starred, rest, isLoading: false }));
   }, []);
 
-  return { isLoading, starred, rest };
+  return { isLoading, starred, rest, onRefresh };
 };
 
 
-const groupByStars = ([repos, stars]: [repos: RepositoryObject[], stars: string[]]) =>
+const groupByStars = ([repos, stars]: [RepositoryObject[], string[]]) =>
   repos.reduce(({ starred, rest }, curr) => {
     stars.find(star => star === curr.full_name)
       ? starred.push(curr)
