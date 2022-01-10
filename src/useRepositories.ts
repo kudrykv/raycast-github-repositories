@@ -25,40 +25,38 @@ export const useRepositories = () => {
     .then(groupByStars)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
 
+  const putFromLeftToRight = (left: RepositoryObject[], right: RepositoryObject[]) => {
+    return (full_name: string) => {
+      const repo = left.find(repo => repo.full_name === full_name);
+      if (!repo) {
+        return [left, right];
+      }
+
+      left = left.filter(repo => repo.full_name !== full_name);
+
+      if (right.length === 0) {
+        return [left, [repo]];
+      }
+
+      const cutIndex = right.findIndex(repo => full_name.toLowerCase() < repo.full_name.toLowerCase());
+      right = cutIndex < 0
+        ? [...right, repo]
+        : [...right.splice(0, cutIndex), repo, ...right];
+
+      return [left, right];
+    };
+  };
+
   const onStar = ({ full_name }: { full_name: string }) =>
     setState(({ starred, rest, ...other }) => {
-      const repo = rest.find(repo => repo.full_name === full_name);
-      if (!repo) {
-        return { ...other, starred, rest };
-      }
-
-      rest = rest.filter(repo => repo.full_name !== full_name);
-
-      if (starred.length === 0) {
-        return { ...other, rest, starred: [repo] };
-      }
-
-      const cutIndex = starred.findIndex(starred => starred.full_name > repo.full_name);
-      starred = [...starred.splice(0, cutIndex + 1), repo, ...starred];
+      [rest, starred] = putFromLeftToRight(rest, starred)(full_name);
 
       return { ...other, starred, rest };
     });
 
   const onUnstar = ({ full_name }: { full_name: string }) =>
     setState(({ starred, rest, ...other }) => {
-      const repo = starred.find(repo => repo.full_name === full_name);
-      if (!repo) {
-        return { ...other, starred, rest };
-      }
-
-      starred = starred.filter(repo => repo.full_name !== full_name);
-
-      if (rest.length === 0) {
-        return { ...other, starred, rest: [repo] };
-      }
-
-      const cutIndex = rest.findIndex(item => item.full_name > repo.full_name);
-      rest = [...rest.splice(0, cutIndex + 1), repo, ...rest];
+      [starred, rest] = putFromLeftToRight(starred, rest)(full_name);
 
       return { ...other, starred, rest };
     });

@@ -5,7 +5,7 @@ import { PullObject, RepositoryObject } from "./types";
 const octokit = new Octokit({ auth: (getPreferenceValues())["github-api-token"] });
 
 export const getRepos = () =>
-  octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, { per_page: 100 })
+  octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, { per_page: 100, sort: "full_name", direction: "asc" })
     .then(list => list as RepositoryObject[]);
 
 
