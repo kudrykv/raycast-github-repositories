@@ -25,19 +25,23 @@ export const useRepositories = () => {
     .then(groupByFavorites)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
 
-  const onStar = ({ full_name }: { full_name: string }) =>
-    setState(({ favorites, rest, ...other }) => {
+  const onStar = ({ full_name }: { full_name: string }) => Promise.resolve()
+    .then(() => setState(({ favorites, rest, ...other }) => {
       [rest, favorites] = putFromLeftToRight(rest, favorites)(full_name);
 
       return { ...other, favorites, rest };
-    });
+    }))
+    .then(() => favorites.map(repo => repo.full_name).concat(full_name))
+    .then(favs => setLocalStorageItem(STORAGE_STARRED, JSON.stringify(favs)));
 
-  const onUnstar = ({ full_name }: { full_name: string }) =>
-    setState(({ favorites, rest, ...other }) => {
+  const onUnstar = ({ full_name }: { full_name: string }) => Promise.resolve()
+    .then(() => setState(({ favorites, rest, ...other }) => {
       [favorites, rest] = putFromLeftToRight(favorites, rest)(full_name);
 
       return { ...other, favorites, rest };
-    });
+    }))
+    .then(() => favorites.map(repo => repo.full_name).filter(name => name !== full_name))
+    .then(favs => setLocalStorageItem(STORAGE_STARRED, JSON.stringify(favs)));
 
   useEffect(() => {
     Promise.all([
