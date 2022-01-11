@@ -100,8 +100,9 @@ const cacheIfNotYetCached = ({ list, cache }: { list: RepositoryObject[], cache:
     ? Promise.resolve(list)
     : setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(list)).then(() => list);
 
-const putFromLeftToRight = (left: RepositoryObject[], right: RepositoryObject[]) => {
-  return (full_name: string) => {
+
+const putFromLeftToRight = (left: RepositoryObject[], right: RepositoryObject[]) =>
+  (full_name: string) => {
     const repo = left.find(repo => repo.full_name === full_name);
     if (!repo) {
       return [left, right];
@@ -120,4 +121,3 @@ const putFromLeftToRight = (left: RepositoryObject[], right: RepositoryObject[])
 
     return [left, right];
   };
-};
