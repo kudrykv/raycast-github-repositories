@@ -28,7 +28,7 @@ export const ListPulls = ({ owner, repo }: { owner: string, repo: string }) => {
 };
 
 
-const PullItem = ({ pull }: { pull: PullObject }) =>
+export const PullItem = ({ pull }: { pull: PullObject }) =>
   <List.Item
     title={pull.title}
     icon={pullIcon(pull)}

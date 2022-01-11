@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { RepositoryObject } from "./types";
 import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem } from "@raycast/api";
 import { getRepos } from "./octokit-interations";
+import { getFavorites } from "./storage-favorites";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
 const STORAGE_FAVS = "starred-repos-full-names";
@@ -19,8 +20,7 @@ export const useRepositories = () => {
       .then(getRepos)
       .then(list => ({ list, cache: false }))
       .then(cacheIfNotYetCached),
-    getLocalStorageItem(STORAGE_FAVS)
-      .then(parseSerializedFavs)
+    getFavorites()
   ])
     .then(groupByFavorites)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
