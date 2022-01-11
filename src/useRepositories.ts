@@ -4,7 +4,7 @@ import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem } from "@ra
 import { getRepos } from "./octokit-interations";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
-const STORAGE_STARRED = "starred-repos-full-names";
+const STORAGE_FAVS = "starred-repos-full-names";
 
 export const useRepositories = () => {
   const [{ favorites, rest, isLoading }, setState] = useState({
@@ -19,29 +19,29 @@ export const useRepositories = () => {
       .then(getRepos)
       .then(list => ({ list, cache: false }))
       .then(cacheIfNotYetCached),
-    getLocalStorageItem(STORAGE_STARRED)
-      .then(parseSerializedStars)
+    getLocalStorageItem(STORAGE_FAVS)
+      .then(parseSerializedFavs)
   ])
     .then(groupByFavorites)
     .then(({ rest }) => setState(prev => ({ ...prev, rest, isLoading: false })));
 
-  const onStar = ({ full_name }: { full_name: string }) => Promise.resolve()
+  const onFavorite = ({ full_name }: { full_name: string }) => Promise.resolve()
     .then(() => setState(({ favorites, rest, ...other }) => {
       [rest, favorites] = putFromLeftToRight(rest, favorites)(full_name);
 
       return { ...other, favorites, rest };
     }))
     .then(() => favorites.map(repo => repo.full_name).concat(full_name))
-    .then(favs => setLocalStorageItem(STORAGE_STARRED, JSON.stringify(favs)));
+    .then(favs => setLocalStorageItem(STORAGE_FAVS, JSON.stringify(favs)));
 
-  const onUnstar = ({ full_name }: { full_name: string }) => Promise.resolve()
+  const onUnFavorite = ({ full_name }: { full_name: string }) => Promise.resolve()
     .then(() => setState(({ favorites, rest, ...other }) => {
       [favorites, rest] = putFromLeftToRight(favorites, rest)(full_name);
 
       return { ...other, favorites, rest };
     }))
     .then(() => favorites.map(repo => repo.full_name).filter(name => name !== full_name))
-    .then(favs => setLocalStorageItem(STORAGE_STARRED, JSON.stringify(favs)));
+    .then(favs => setLocalStorageItem(STORAGE_FAVS, JSON.stringify(favs)));
 
   useEffect(() => {
     Promise.all([
@@ -49,14 +49,14 @@ export const useRepositories = () => {
         .then(serializedRepos)
         .then(pullOnEmptyCache)
         .then(cacheIfNotYetCached),
-      getLocalStorageItem(STORAGE_STARRED)
-        .then(parseSerializedStars)
+      getLocalStorageItem(STORAGE_FAVS)
+        .then(parseSerializedFavs)
     ])
       .then(groupByFavorites)
       .then(({ favorites, rest }) => setState({ favorites, rest, isLoading: false }));
   }, []);
 
-  return { isLoading, favorites, rest, onRefresh, onFavorite: onStar, onUnFavorite: onUnstar };
+  return { isLoading, favorites, rest, onRefresh, onFavorite: onFavorite, onUnFavorite: onUnFavorite };
 };
 
 
@@ -90,7 +90,7 @@ const pullOnEmptyCache = ({ list, cache }: { list: RepositoryObject[], cache: bo
     : getRepos().then(list => ({ list, cache: false }));
 
 
-const parseSerializedStars = (serialized: LocalStorageValue | undefined): string[] => {
+const parseSerializedFavs = (serialized: LocalStorageValue | undefined): string[] => {
   if (!serialized || typeof serialized !== "string") {
     return [];
   }
