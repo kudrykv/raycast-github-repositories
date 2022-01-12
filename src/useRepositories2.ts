@@ -30,7 +30,13 @@ export const useRepositories2 = () => {
 
         return list;
       })
-      .then(repos => repos.length > 0 ? repos : getRepos())
+      .then(
+        repos =>
+          repos.length > 0
+            ? repos
+            : getRepos()
+              .then(repos => setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(repos)).then(() => repos))
+      )
       .then(setRepositories)
       .then(() => setIsLoading(false));
   }, []);
