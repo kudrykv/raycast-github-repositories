@@ -1,17 +1,22 @@
 import { List, showToast, ToastStyle } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getFavorites } from "./storage-favorites";
 import { getPulls } from "./octokit-interations";
 import { PullObject } from "./types";
 import { PullItem } from "./ListPulls";
+import { useFavorites } from "./useFavorites";
 
 // noinspection JSUnusedGlobalSymbols
 export default function CommandPulls() {
+  const { favorites } = useFavorites();
   const [isLoading, setIsLoading] = useState(true);
   const [state, setState] = useState<[string, PullObject[]][]>([]);
 
   useEffect(() => {
-    getFavorites()
+    if (favorites.length === 0) {
+      return;
+    }
+
+    Promise.resolve(favorites)
       .then(favs => Promise.all([
         Promise.resolve(favs),
         Promise.all(favs.map(fav => fav.split("/")).map(([owner, repo]) => getPulls({ owner, repo })))
@@ -22,7 +27,7 @@ export default function CommandPulls() {
       .then(setState)
       .then(() => setIsLoading(false))
       .catch(e => showToast(ToastStyle.Failure, e.message));
-  }, []);
+  }, [favorites]);
 
   return <List isLoading={isLoading}>
     {state.map(([fav, pulls]) =>
