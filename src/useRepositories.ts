@@ -5,7 +5,7 @@ import { getRepos } from "./octokit-interations";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
 
-export const useRepositories2 = () => {
+export const useRepositories = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [repositories, setRepositories] = useState<RepositoryObject[]>([]);
 

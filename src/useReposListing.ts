@@ -1,11 +1,11 @@
-import { useRepositories2 } from "./useRepositories2";
+import { useRepositories } from "./useRepositories";
 import { useFavorites } from "./useFavorites";
 import { useEffect, useState } from "react";
 import { RepositoryObject } from "./types";
 
 export const useReposListing = () => {
   const { favorites, addFavorite, rmFavorite } = useFavorites();
-  const { isLoading, repositories, refreshRepositories } = useRepositories2();
+  const { isLoading, repositories, refreshRepositories } = useRepositories();
   const [{ faved, rest }, setState] = useState({
     faved: [],
     rest: []
