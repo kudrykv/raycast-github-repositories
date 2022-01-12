@@ -2,17 +2,19 @@
 
 import { ListRepositories } from "./ListRepositories";
 import { useRepositories } from "./useRepositories";
+import { useReposListing } from "./useReposListing";
 
 const Command = () => {
-  const { isLoading, favorites, rest, onRefresh, onFavorite, onUnFavorite } = useRepositories();
+  // const { isLoading, favorites, rest, onRefresh, onFavorite, onUnFavorite } = useRepositories();
+  const { isLoading, rest, faved, rmFavorite, addFavorite, refreshRepositories } = useReposListing();
 
   return <ListRepositories
     isLoading={isLoading}
-    favorites={favorites}
+    favorites={faved}
     rest={rest}
-    onRefresh={onRefresh}
-    onFavorite={onFavorite}
-    onUnFavorite={onUnFavorite}
+    onRefresh={refreshRepositories}
+    onFavorite={addFavorite}
+    onUnFavorite={rmFavorite}
   />;
 };
 
