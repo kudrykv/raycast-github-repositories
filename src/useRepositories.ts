@@ -18,28 +18,31 @@ export const useRepositories = () => {
 
   useEffect(() => {
     getLocalStorageItem(STORAGE_FULL_NAMES)
-      .then((serialized: LocalStorageValue | undefined) => {
-        if (!serialized || typeof serialized !== "string" || serialized.length < 3) {
-          return [];
-        }
-
-        const list = JSON.parse(serialized) as RepositoryObject[];
-        if (!list || !list.length || list.length === 0) {
-          return [];
-        }
-
-        return list;
-      })
-      .then(
-        repos =>
-          repos.length > 0
-            ? repos
-            : getRepos()
-              .then(repos => setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(repos)).then(() => repos))
-      )
+      .then(parseRepositories)
+      .then(pullRepositoriesIfEmpty)
       .then(setRepositories)
       .then(() => setIsLoading(false));
   }, []);
 
   return { isLoading, repositories, refreshRepositories };
 };
+
+const parseRepositories = (serialized: LocalStorageValue | undefined) => {
+  if (!serialized || typeof serialized !== "string" || serialized.length < 3) {
+    return [];
+  }
+
+  const list = JSON.parse(serialized) as RepositoryObject[];
+  if (!list || !list.length || list.length === 0) {
+    return [];
+  }
+
+  return list;
+};
+
+const pullRepositoriesIfEmpty = (repos: RepositoryObject[]) =>
+  repos.length > 0
+    ? repos
+    : getRepos()
+      .then(repos => setLocalStorageItem(STORAGE_FULL_NAMES, JSON.stringify(repos)).then(() => repos));
+
