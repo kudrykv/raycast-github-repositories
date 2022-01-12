@@ -85,21 +85,21 @@ const RepositoryItemActionPanel = ({ repo, onRefresh, onFavorite, onUnFavorite }
       shortcut={{ key: "p", modifiers: ["cmd", "shift"] }}
       icon={{ source: { light: "git-pull-request.png", dark: "git-pull-request.png" } }}
     />
-    <ActionPanel.Item icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onAction={onRefresh} />
     {onFavorite &&
       <ActionPanel.Item
         icon={Icon.ArrowClockwise}
-        title={"Star"}
+        title={"Favorite"}
         onAction={() => onFavorite({ full_name: repo.full_name })}
-        shortcut={{ key: "s", modifiers: ["cmd", "shift"] }}
+        shortcut={{ key: "f", modifiers: ["cmd", "shift"] }}
       />
     }
     {onUnFavorite &&
       <ActionPanel.Item
         icon={Icon.ArrowClockwise}
-        title={"Unstar"}
+        title={"Unfavorite"}
         onAction={() => onUnFavorite({ full_name: repo.full_name })}
-        shortcut={{ key: "s", modifiers: ["cmd", "shift"] }}
+        shortcut={{ key: "f", modifiers: ["cmd", "shift"] }}
       />
     }
+    <ActionPanel.Item icon={Icon.ArrowClockwise} title={"Refresh Repositories List"} onAction={onRefresh} />
   </ActionPanel>;
