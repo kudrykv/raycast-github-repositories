@@ -1,5 +1,5 @@
 import { ActionPanel, Icon, List, OpenInBrowserAction, PushAction } from "@raycast/api";
-import { ListPulls } from "./ListPulls";
+import { ListPulls } from "./components/ListPulls";
 import { RepositoryObject } from "./types";
 
 interface ListRepositoriesParams {

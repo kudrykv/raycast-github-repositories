@@ -1,8 +1,8 @@
 import { List } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getPreparedPulls } from "./octokit-interations";
-import { PullObject } from "./types";
-import { PullItem } from "./components/PullItem";
+import { getPreparedPulls } from "../octokit-interations";
+import { PullObject } from "../types";
+import { PullItem } from "./PullItem";
 
 export const ListPulls = ({ owner, repo }: { owner: string, repo: string }) => {
   const [isLoading, setIsLoading] = useState(true);
