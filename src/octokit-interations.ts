@@ -26,10 +26,14 @@ export const getPreparedPulls = ({ owner, repo }: { owner: string, repo: string 
 type State = "open" | "all" | "closed" | undefined;
 type Sort = "created" | "updated" | "popularity" | "long-running" | undefined;
 
-export const getPulls = ({
-                           owner,
-                           repo,
-                           state = "open",
-                           sort = "created"
-                         }: { owner: string, repo: string, state?: State, sort?: Sort }): Promise<PullObject[]> =>
-  octokit.paginate(octokit.rest.pulls.list, { owner, repo, state, sort }) as Promise<PullObject[]>;
+interface PullsParams {
+  owner: string;
+  repo: string;
+  state?: State;
+  sort?: Sort;
+}
+
+export const getPulls = ({ owner, repo, state = "open", sort = "created" }: PullsParams): Promise<PullObject[]> =>
+  Promise.resolve()
+    .then(() => console.debug(`getPulls for ${owner}/${repo}, state ${state}, sort ${sort}`))
+    .then(() => octokit.paginate(octokit.rest.pulls.list, { owner, repo, state, sort }) as Promise<PullObject[]>);

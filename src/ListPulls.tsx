@@ -28,7 +28,7 @@ export const ListPulls = ({ owner, repo }: { owner: string, repo: string }) => {
 };
 
 
-export const PullItem = ({ pull }: { pull: PullObject }) =>
+export const PullItem = ({ pull, onReload }: { pull: PullObject, onReload?: () => void }) =>
   <List.Item
     title={pull.title}
     icon={pullIcon(pull)}
@@ -37,6 +37,7 @@ export const PullItem = ({ pull }: { pull: PullObject }) =>
     actions={
       <ActionPanel>
         <OpenInBrowserAction url={pull.html_url} />
+        {onReload && <ActionPanel.Item title={"Reload Pulls"} onAction={onReload} />}
       </ActionPanel>
     }
   />
