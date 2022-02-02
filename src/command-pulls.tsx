@@ -1,6 +1,6 @@
 import { List } from "@raycast/api";
-import { PullItem } from "./ListPulls";
 import { usePulls } from "./hooks/usePulls";
+import { PullItem } from "./components/PullItem";
 
 // noinspection JSUnusedGlobalSymbols
 export default function CommandPulls() {
