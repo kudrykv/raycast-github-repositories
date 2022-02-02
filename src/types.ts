@@ -68,4 +68,20 @@ export interface PullObject {
     description: string;
   }[];
   draft: boolean;
+  reviews?: ReviewObject[];
+}
+
+export interface ReviewObject {
+  id: number;
+  user: {
+    login: string;
+    id: number;
+    avatar_url: string;
+    type: string;
+  };
+  body: string;
+  state: string;
+  pull_request_url: string;
+  submitted_at: string;
+  author_association: string;
 }
