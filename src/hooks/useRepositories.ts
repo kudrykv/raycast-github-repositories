@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem } from "@raycast/api";
-import { RepositoryObject } from "./types";
-import { getRepos } from "./octokit-interations";
+import { RepositoryObject } from "../types";
+import { getRepos } from "../octokit-interations";
 
 const STORAGE_FULL_NAMES = "cached-full-names";
 

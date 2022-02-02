@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import { ListRepositories } from "./ListRepositories";
-import { useReposListing } from "./useReposListing";
+import { useReposListing } from "./hooks/useReposListing";
 
 const Command = () => {
   const { isLoading, rest, faved, rmFavorite, addFavorite, refreshRepositories } = useReposListing();

@@ -1,7 +1,7 @@
 import { useRepositories } from "./useRepositories";
 import { useFavorites } from "./useFavorites";
 import { useEffect, useState } from "react";
-import { RepositoryObject } from "./types";
+import { RepositoryObject } from "../types";
 
 export const useReposListing = () => {
   const { favorites, addFavorite, rmFavorite } = useFavorites();

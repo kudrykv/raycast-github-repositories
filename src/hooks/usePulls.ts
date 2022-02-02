@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem } from "@raycast/api";
-import { getPulls } from "./octokit-interations";
+import { getPulls } from "../octokit-interations";
 import { useFavorites } from "./useFavorites";
-import { PullObject } from "./types";
+import { PullObject } from "../types";
 
 const STORAGE_PULL_LAST_REFRESH = "pull-last-refresh";
 const STORAGE_PULLS = "pulls-cached";
