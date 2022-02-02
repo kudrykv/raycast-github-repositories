@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { ListRepositories } from "./ListRepositories";
+import { ListRepositories } from "./components/ListRepositories";
 import { useReposListing } from "./hooks/useReposListing";
 
 const Command = () => {

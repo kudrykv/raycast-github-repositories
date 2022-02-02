@@ -1,49 +1,6 @@
 import { ActionPanel, Icon, List, OpenInBrowserAction, PushAction } from "@raycast/api";
-import { ListPulls } from "./components/ListPulls";
-import { RepositoryObject } from "./types";
-
-interface ListRepositoriesParams {
-  isLoading: boolean;
-  favorites: RepositoryObject[];
-  rest: RepositoryObject[];
-  onRefresh: () => void;
-  onFavorite: ({ full_name }: { full_name: string }) => void;
-  onUnFavorite: ({ full_name }: { full_name: string }) => void;
-}
-
-export const ListRepositories = ({
-                                   favorites,
-                                   rest,
-                                   isLoading,
-                                   onRefresh,
-                                   onFavorite,
-                                   onUnFavorite
-                                 }: ListRepositoriesParams) =>
-  <List isLoading={isLoading}>
-    {favorites && favorites.length > 0 &&
-      <List.Section title="Favorites">
-        {favorites.map(repo => <RepoItem
-          key={repo.id}
-          repo={repo}
-          isLoading={isLoading}
-          onRefresh={onRefresh}
-          onUnFavorite={onUnFavorite}
-        />)}
-      </List.Section>
-    }
-    {rest && rest.length > 0 &&
-      <List.Section title="Repos">
-        {rest.map(repo => <RepoItem
-          key={repo.id}
-          repo={repo}
-          isLoading={isLoading}
-          onRefresh={onRefresh}
-          onFavorite={onFavorite}
-        />)}
-      </List.Section>
-    }
-  </List>;
-
+import { RepositoryObject } from "../types";
+import { ListPulls } from "./ListPulls";
 
 interface RepoItemParams {
   repo: RepositoryObject;
@@ -53,7 +10,7 @@ interface RepoItemParams {
   onUnFavorite?: ({ full_name }: { full_name: string }) => void;
 }
 
-const RepoItem = ({ repo, isLoading, onRefresh, onFavorite, onUnFavorite }: RepoItemParams) =>
+export const RepoItem = ({ repo, isLoading, onRefresh, onFavorite, onUnFavorite }: RepoItemParams) =>
   <List.Item
     id={repo.full_name}
     key={repo.full_name}
@@ -67,7 +24,6 @@ const RepoItem = ({ repo, isLoading, onRefresh, onFavorite, onUnFavorite }: Repo
                                      onUnFavorite={onUnFavorite} />
     }
   />;
-
 
 interface RepoItemActionPanelParams {
   repo: RepositoryObject;
