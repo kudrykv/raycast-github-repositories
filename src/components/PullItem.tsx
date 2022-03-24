@@ -1,5 +1,14 @@
 import { PullObject, ReviewObject } from "../types";
-import { ActionPanel, Color, ImageLike, List, OpenInBrowserAction } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Color,
+  getPreferenceValues,
+  ImageLike,
+  List,
+} from "@raycast/api";
+
+const jiraDomain = getPreferenceValues()["jira_domain"];
 
 export const PullItem = ({ pull, onReload }: { pull: PullObject, onReload?: () => void }) =>
   <List.Item
@@ -10,7 +19,22 @@ export const PullItem = ({ pull, onReload }: { pull: PullObject, onReload?: () =
     accessoryTitle={new Date(pull.created_at).toLocaleString()}
     actions={
       <ActionPanel>
-        <OpenInBrowserAction url={pull.html_url} />
+        <Action.OpenInBrowser url={pull.html_url} />
+        {
+          jiraDomain && jiraTicket(pull.title) &&
+          <Action.OpenInBrowser
+            title="Open in JIRA"
+            url={`${jiraDomain}/browse/${jiraTicket(pull.title)}`}
+            shortcut={{ key: "j", modifiers: ["cmd"] }}
+          />
+        }
+        {
+          jiraTicket(pull.title) &&
+          <Action.CopyToClipboard
+            content={jiraTicket(pull.title)}
+            shortcut={{ key: "c", modifiers: ["cmd"] }}
+          />
+        }
         {onReload && <ActionPanel.Item title={"Reload Pulls"} onAction={onReload} />}
       </ActionPanel>
     }
@@ -50,4 +74,12 @@ const pullIcon = ({ draft, merged_at, closed_at }: PullObject): ImageLike => {
   }
 
   return { source: { light: "git-pull-request.png", dark: "git-pull-request.png" }, tintColor: Color.Green };
+};
+
+const jiraTicket = (title: string): string => {
+  const match = title.match(/[A-Z]{2,30}-\d+/);
+
+  if (!match) return "";
+
+  return match[0];
 };

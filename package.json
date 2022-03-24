@@ -30,6 +30,14 @@
       "required": true,
       "title": "Github API Token",
       "placeholder": "Github API Token"
+    },
+    {
+      "label": "jira_domain",
+      "name": "jira_domain",
+      "description": "JIRA domain",
+      "type": "textfield",
+      "required": false,
+      "title": "JIRA domain to generate and open links to JIRA tickets"
     }
   ],
   "dependencies": {
