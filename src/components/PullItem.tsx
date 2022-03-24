@@ -1,12 +1,5 @@
 import { PullObject, ReviewObject } from "../types";
-import {
-  Action,
-  ActionPanel,
-  Color,
-  getPreferenceValues,
-  ImageLike,
-  List,
-} from "@raycast/api";
+import { Action, ActionPanel, Color, getPreferenceValues, Image, List } from "@raycast/api";
 
 const jiraDomain = getPreferenceValues()["jira_domain"];
 
@@ -31,7 +24,7 @@ export const PullItem = ({ pull, onReload }: { pull: PullObject, onReload?: () =
         {
           jiraTicket(pull.title) &&
           <Action.CopyToClipboard
-            content={jiraTicket(pull.title)}
+            content={jiraTicket(pull.title) || ""}
             shortcut={{ key: "c", modifiers: ["cmd"] }}
           />
         }
@@ -57,7 +50,7 @@ const reviewStatesToEmojis = {
   "DISMISSED": "⚪️"
 } as Record<string, string>;
 
-const pullIcon = ({ draft, merged_at, closed_at }: PullObject): ImageLike => {
+const pullIcon = ({ draft, merged_at, closed_at }: PullObject): Image.ImageLike => {
   if (draft) {
     return { source: { light: "git-pull-request-draft.png", dark: "git-pull-request-draft.png" } };
   }
@@ -76,10 +69,10 @@ const pullIcon = ({ draft, merged_at, closed_at }: PullObject): ImageLike => {
   return { source: { light: "git-pull-request.png", dark: "git-pull-request.png" }, tintColor: Color.Green };
 };
 
-const jiraTicket = (title: string): string => {
+const jiraTicket = (title: string): string | undefined => {
   const match = title.match(/[A-Z]{2,30}-\d+/);
 
-  if (!match) return "";
+  if (!match) return;
 
   return match[0];
 };

@@ -1,4 +1,4 @@
-import { ActionPanel, Icon, List, OpenInBrowserAction, PushAction } from "@raycast/api";
+import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { RepositoryObject } from "../types";
 import { ListPulls } from "./ListPulls";
 
@@ -34,8 +34,8 @@ interface RepoItemActionPanelParams {
 
 const RepositoryItemActionPanel = ({ repo, onRefresh, onFavorite, onUnFavorite }: RepoItemActionPanelParams) =>
   <ActionPanel>
-    <OpenInBrowserAction title="Open repository" url={`https://github.com/${repo.full_name}`} />
-    <PushAction
+    <Action.OpenInBrowser title="Open repository" url={`https://github.com/${repo.full_name}`} />
+    <Action.Push
       title={"Pull Requests"}
       target={<ListPulls owner={repo.owner?.login || ""} repo={repo.name} />}
       shortcut={{ key: "p", modifiers: ["cmd", "shift"] }}

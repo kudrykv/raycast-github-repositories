@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getLocalStorageItem, LocalStorageValue, setLocalStorageItem } from "@raycast/api";
+import { LocalStorage } from "@raycast/api";
 import { getPulls } from "../octokit-interations";
 import { useFavorites } from "./useFavorites";
 import { PullObject } from "../types";
@@ -27,8 +27,8 @@ export const usePulls = () => {
       return;
     }
 
-    getLocalStorageItem(STORAGE_PULL_LAST_REFRESH)
-      .then((serialized: LocalStorageValue | undefined) => typeof serialized === "number" ? serialized : 0)
+    LocalStorage.getItem(STORAGE_PULL_LAST_REFRESH)
+      .then((serialized: LocalStorage.Value | undefined) => typeof serialized === "number" ? serialized : 0)
       .then(ts => Date.now() - ts)
       .then(diff =>
         diff > 60_000
@@ -60,19 +60,19 @@ const getFavPulls = (favorites: string[]) =>
 const savePullsToLocalStorage = (list: GroupedPull[]) =>
   Promise.resolve()
     .then(() => console.debug("savePullsToLocalStorage"))
-    .then(() => setLocalStorageItem(STORAGE_PULLS, JSON.stringify(list)))
-    .then(() => setLocalStorageItem(STORAGE_PULL_LAST_REFRESH, Date.now()))
+    .then(() => LocalStorage.setItem(STORAGE_PULLS, JSON.stringify(list)))
+    .then(() => LocalStorage.setItem(STORAGE_PULL_LAST_REFRESH, Date.now()))
     .then(() => list);
 
 
 const getPullsFromLocalStorage = () =>
   Promise.resolve()
     .then(() => console.debug("getPullsFromLocalStorage"))
-    .then(() => getLocalStorageItem(STORAGE_PULLS))
+    .then(() => LocalStorage.getItem(STORAGE_PULLS))
     .then(parseSerializedPulls);
 
 
-const parseSerializedPulls = (serialized: LocalStorageValue | undefined) => {
+const parseSerializedPulls = (serialized: LocalStorage.Value | undefined) => {
   if (!serialized || typeof serialized !== "string" || serialized.length < 3) {
     return [];
   }
